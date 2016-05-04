@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
-PWD=`security find-generic-password -wa $1`
-printf "$PWD"
-#printf %q "$PWD" #Escaped PWD!
+service=macmounter
+account=$service.$1
+
+PASSWD=$(security find-generic-password -w -a $account -s $service)
+printf "$PASSWD"
