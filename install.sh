@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-USER=`logname`
+USER=$(logname)
+HOME=$(eval echo "~$USER")
+echo "USER=$USER" 
+echo "HOME=$HOME" 
 
-echo "Creating .macmounter folder..."
+echo "Creating $HOME/.macmounter"
 mkdir -p "$HOME/.macmounter"
 if [ ! -d "$HOME/.macmounter" ]; then
     echo "Error creating .macmounter folder."
@@ -12,7 +15,7 @@ fi
 cp ./sample/example.conf "$HOME/.macmounter"
 chown $USER "$HOME/.macmounter/example.conf"
 
-echo "Creating application folder..."
+echo "Creating $HOME/Library/Application Support/macmounter"
 mkdir -p "$HOME/Library/Application Support/macmounter"
 if [ ! -d "$HOME/Library/Application Support/macmounter" ]; then
     echo "Error creating application folder."
@@ -25,19 +28,23 @@ if [ ! -d /usr/local/bin/ ]; then
     mkdir -p /usr/local/bin/ 
 fi
 
-echo "Installing script..."
+echo "Installing scripts in /usr/local/bin"
 cp ./scripts/macmounter.py /usr/local/bin
 if [ ! -f /usr/local/bin/macmounter.py ]; then
     echo "Error installing script."
 fi
 
-echo "Installing launcher"
+echo "Installing launcher in $HOME/Library/LaunchAgents"
 cp ./launch/com.irouble.macmounter.plist "$HOME/Library/LaunchAgents"
 if [ ! -f "$HOME/Library/LaunchAgents/com.irouble.macmounter.plist" ]; then
     echo "Error installing launcher."
 else
-    echo "Stopping service"
-    launchctl unload "$HOME/Library/LaunchAgents/com.irouble.macmounter.plist"
+    sudo -u $USER launchctl list | grep macmounter
+    if [ $? -eq 0 ]; then
+        echo "Stopping service"
+        sudo -u $USER launchctl unload "$HOME/Library/LaunchAgents/com.irouble.macmounter.plist"
+    fi
+    sleep 2
     echo "Starting service"
-    launchctl load -w "$HOME/Library/LaunchAgents/com.irouble.macmounter.plist"
+    sudo -u $USER launchctl load -w "$HOME/Library/LaunchAgents/com.irouble.macmounter.plist"
 fi

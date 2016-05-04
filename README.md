@@ -24,19 +24,20 @@ Add config files in the directory ~/.macmounter/
 
 A simple config file looks like:
 ```
+$ cat example.conf
 [example.com]
 MOUNT_TEST_CMD=ls -l /Users/roubles/somelocalfolder/
 PING_CMD=/sbin/ping -q -c3 -o example.com 
 PRE_MOUNT_CMD=/bin/mkdir -p /Users/roubles/somelocalfolder/
 MOUNT_CMD=/usr/local/bin/sshfs roubles@example.com:/someremotefolder /Users/roubles/somelocalfolder/ -oauto_cache,reconnect,volname=example
-MOUNT_SUCCESS_CMD=/bin/echo "" | /usr/bin/mail -s "mounted example.com!" roubles@github.com
+FOUND_MOUNT_CMD=/bin/echo "" | /usr/bin/mail -s "mounted example.com!" roubles@github.com
 
 [anotherexample.com]
 MOUNT_TEST_CMD=ls -l /Volumes/someotherfolder && /sbin/mount | grep -q someotherfolder
 PING_CMD=/sbin/ping -q -c3 -o anotherexample.com
 PRE_MOUNT_CMD=/sbin/umount -f /Volumes/someotherfolder; /bin/mkdir -p /Volumes/someotherfolder
 MOUNT_CMD=/sbin/mount -t smbfs "//roubles:whatmeworry@anotherexample.com/someotherremotefolder" /Volumes/someotherfolder
-MOUNT_SUCCESS_CMD=/bin/echo "" | /usr/bin/mail -s "mounted anotherexample.com!" roubles@github.com
+FOUND_MOUNT_CMD=/bin/echo "" | /usr/bin/mail -s "mounted anotherexample.com!" roubles@github.com
 ```
 
 But, it can be simpler. The simplest config only needs to specify MOUNT_CMD, though this may be inefficient.
@@ -58,12 +59,27 @@ You can manually startup macmounter using the commandline:
 ```
 launchctl load -w ~/Library/LaunchAgents/com.irouble.macmounter.plist
 ```
-
 or, logout and log back in.
+
+## Quick reload configs
+There may be instances where you don't want to wait for macmounters timers to kick in to perform mounts. For this,you can force it to re-attempt all mounts instantly by running:
+```
+$ macmounter.py --reload
+```
 
 ## Logs
 
 Detailed logs can be found here: ~/Library/Application Support/macmounter/macmounter.log
+
+## Troubleshooting
+
+Tail ~/Library/Application Support/macmounter/macmounter.log, it is very informative.
+
+I find these bash aliases handy:
+```
+alias tailmmlogs='tail -f ~/Library/Application\ Support/macmounter/macmounter.log'
+alias vimmlogs='vi ~/Library/Application\ Support/macmounter/macmounter.log'
+```
 
 ## Basic example
 
@@ -73,6 +89,9 @@ A basic configuration example that should get you started can be found [here](ht
 
 ### Testing mounts before remounting
 It is prudent to test if the mount is active and functioning before blindly remounting. [These examples](https://github.com/roubles/macmounter/wiki/testing-mounts) show the various options for testing mounts.
+
+### Multiple mounts from the same server
+This is pretty straight forward, just add a section for each mount. [These examples] (https://github.com/roubles/macmounter/wiki/Mounting-multiple-folders-from-the-same-server) show examples.
 
 ### Waking up servers before mounting
 Sometimes NAS boxes go to sleep when idle. [These examples](https://github.com/roubles/macmounter/wiki/wakeup-server-before-mounting) show the various options for waking up remote drives on the LAN. 
