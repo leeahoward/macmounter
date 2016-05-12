@@ -16,5 +16,4 @@ fi
 #echo "account: $account"
 #echo "service: $service"
 #echo "Got pwd: $password"
-
-security add-generic-password -a ${account} -s ${service} -w ${password}
+security add-generic-password -a "${account}" -s "${service}" -w "${password}"
